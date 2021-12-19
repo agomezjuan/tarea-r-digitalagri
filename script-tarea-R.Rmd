@@ -1,0 +1,94 @@
+---
+title: "Tarea R DigitalAgri"
+author: "Alberto Gómez Juan"
+date: "10/12/2021"
+output: 
+  html_document:
+    toc: yes
+    toc_depth: 2
+lang: es-ES
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Procesos y Casos de Innovación y Digitalización y Vigilancia en el Sector Agroalimentario, y Forestal y del Desarrollo Rural
+
+#### Tema: Fundamentos del programa R
+
+
+
+## Objetivos
+
+- Analizar un conjunto de datos de la FAO teniendo en cuenta los conceptos estadísticos vistos en clase.
+- Aplicar los fundamentos del programa R para el análisis de datos.
+- Verificar si existe relación entre área cosechada, producción, rendimiento de aceitunas en España y las exportaciones de aceite de oliva virgen entre los años 1980 y 2020.
+
+
+
+## Datos utilizados
+
+Los datos utilizados para el estudio fueron obtenidos de los datos abiertos de la FAO (<http://www.fao.org/faostat/es/#home>) y corresponden al reporte de superficie de tierra agrícola y la producción de aceitunas entre los años 1970 y 2019. 
+
+## Metodología
+
+Se incluyen las librerias utilizadas para el analisis de los datos:
+
+```{r, message=FALSE}
+# Importar las librerias utilizadas
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r, warning=FALSE}
+# Lectura de datos a partir de un archivo CSV.
+areacosechada_origen <- read.csv("datos/FAOSTAT_data_12-18-2021_area.csv")
+rendimiento_origen <- read.csv("datos/FAOSTAT_data_12-18-2021_rendimiento.csv")
+produccion_origen <- read.csv("datos/FAOSTAT_data_12-18-2021_produccion.csv")
+exportaciones_origen <- read.csv("datos/FAOSTAT_data_12-18-2021_exportaciones.csv")
+
+# Extracción de las columnas correspondientes a año y producción.
+areacosechada <- areacosechada_origen[, c(12)]
+rendimiento <- rendimiento_origen[, c(12)]
+produccion <- produccion_origen[, c(12)]
+exportaciones <- exportaciones_origen[, c(12)]
+
+# Lista de años
+anios <- produccion_origen[, c(10)]
+
+# Asignación de años a los datos de area cosechada
+names(areacosechada) <- anios
+
+# Convertir en dataframe
+df <- data.frame(cbind(areacosechada, produccion, rendimiento, exportaciones))
+
+```
+
+## Interpretación de resultados
+
+```{r, warning=FALSE}
+data(df)
+head(df,3)
+tail(df,3)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r message=FALSE}
+
+modelo <- lm(exportaciones~produccion, data = df)
+summary(modelo)
+
+ggplot(df, aes(x = exportaciones, y = produccion)) +
+  geom_point() +
+  stat_smooth()+
+  xlab("Velocidad (km/h)")+
+  ylab("Distancia de frenado") +
+  ggtitle("Cars. Distancia de frenado-Velocidad")
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
